@@ -13,6 +13,15 @@ class AboutViewTest(TestCase):
         self.assertTemplateUsed(response, "main/about.html")
 
 
+class BlogDetailView(TestCase):
+    def test_renders_correct_template(self):
+        post = mommy.make("main.Blog")
+        response = self.client.get(
+            reverse("main:post", args=[str(post.id), post.slug])
+        )
+        self.assertTemplateUsed(response, "main/post.html")
+
+
 class ContactFormSuccessViewTest(TestCase):
 
     def test_renders_correct_template(self):

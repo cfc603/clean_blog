@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.views.generic.list import ListView
 
@@ -9,6 +10,11 @@ from .models import Blog
 
 class AboutView(TemplateView):
     template_name = "main/about.html"
+
+
+class BlogDetailView(DetailView):
+    model = Blog
+    template_name = "main/post.html"
 
 
 class ContactFormSuccessView(TemplateView):
