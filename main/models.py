@@ -17,6 +17,9 @@ class Blog(CreatedUpdated):
     live = models.BooleanField(default=False)
     category = models.ManyToManyField("main.Category")
 
+    class Meta:
+        ordering = ['modified_date']
+
     def __unicode__(self):
         return '%s' % self.title
 
