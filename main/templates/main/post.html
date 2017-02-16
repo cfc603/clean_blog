@@ -1,0 +1,32 @@
+{% extends "main/_base.html" %}
+{% load staticfiles %}
+
+<!-- Head -->
+{% block title %}Clean Blog - {{ object.title }}{% endblock %}
+
+<!-- body -->
+
+<!-- Header -->
+{% block header_image %}{% static 'main/img/post-bg.jpg' %}{% endblock %}
+
+{% block header %}
+<div class="post-heading">
+    <h1>{{ object.title }}</h1>
+    <h2 class="subheading">{{ object.body|truncatewords:15 }}</h2>
+    <span class="meta">Posted by <a href="{% url 'main:about' %}">Trevor Watson</a> on {{ object.modified_date|date:"N j, Y" }}</span>
+</div>
+{% endblock %}
+
+
+<!-- Content -->
+{% block content %}
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                {{ object.body }}
+            </div>
+        </div>
+    </div>
+</article>
+{% endblock %}
