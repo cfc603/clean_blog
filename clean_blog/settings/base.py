@@ -34,6 +34,9 @@ INSTALLED_APPS = (
 
     # local apps
     'main',
+
+    # third-party apps
+    'django_forms_bootstrap',
 )
 
 MIDDLEWARE_CLASSES = (
