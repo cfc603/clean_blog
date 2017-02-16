@@ -1,8 +1,10 @@
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
+from django.views.generic.list import ListView
 
 from .forms import ContactForm
+from .models import Blog
 
 
 class AboutView(TemplateView):
@@ -24,5 +26,10 @@ class ContactView(FormView):
         return super(ContactView, self).form_valid(form)
 
 
-class HomeView(TemplateView):
+class HomeView(ListView):
+    model = Blog
     template_name = "main/home.html"
+
+    def get_queryset(self):
+        queryset = super(HomeView, self).get_queryset()
+        return queryset.filter(live=True)

@@ -1,6 +1,8 @@
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from model_mommy import mommy
+
 from main.forms import ContactForm
 
 
@@ -42,3 +44,10 @@ class HomeViewTest(TestCase):
     def test_renders_correct_template(self):
         response = self.client.get(reverse("main:home"))
         self.assertTemplateUsed(response, "main/home.html")
+
+    def test_get_queryset(self):
+        # only live blog posts
+        posts = mommy.make("main.Blog", _quantity=10)
+        live_posts = mommy.make("main.Blog", live=True, _quantity=5)
+        response = self.client.get(reverse("main:home"))
+        self.assertEqual(5, response.context['object_list'].count())
