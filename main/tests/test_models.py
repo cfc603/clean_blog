@@ -13,6 +13,13 @@ class BlogTest(TestCase):
         blog = mommy.make("main.Blog", title="Here Is A Test title")
         self.assertEqual(blog.slug, "here-is-a-test-title")
 
+    def test_get_absolute_url(self):
+        blog = mommy.make("main.Blog", title="Here Is A Test title")
+        self.assertEqual(
+            blog.get_absolute_url(),
+            "/post/{}/here-is-a-test-title/".format(blog.id)
+        )
+
 
 class CategoryTest(TestCase):
 

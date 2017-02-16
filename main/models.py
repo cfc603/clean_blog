@@ -27,6 +27,9 @@ class Blog(CreatedUpdated):
     def slug(self):
         return slugify(self.title)
 
+    def get_absolute_url(self):
+        return reverse("main:post", args=[str(self.id), self.slug])
+
 
 class Category(CreatedUpdated):
     title = models.CharField(max_length=100)
