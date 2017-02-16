@@ -1,0 +1,6 @@
+{{ name }},
+
+Thank you for reaching out. I will be in contact as soon as soon as possible.
+
+Best,
+Trevor Watson
