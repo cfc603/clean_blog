@@ -9,6 +9,13 @@ class AboutViewTest(TestCase):
         self.assertTemplateUsed(response, "main/about.html")
 
 
+class ContactFormSuccessViewTest(TestCase):
+
+    def test_renders_correct_template(self):
+        response = self.client.get(reverse("main:contact_form_success"))
+        self.assertTemplateUsed(response, "main/contact-form-success.html")
+
+
 class ContactViewTest(TestCase):
 
     def test_renders_correct_template(self):

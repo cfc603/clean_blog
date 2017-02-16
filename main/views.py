@@ -5,7 +5,11 @@ class AboutView(TemplateView):
     template_name = "main/about.html"
 
 
-class ContactView(TemplateView):
+class ContactFormSuccessView(TemplateView):
+    template_name = "main/contact-form-success.html"
+
+
+class ContactView(FormView):
     template_name = "main/contact.html"
 
 
