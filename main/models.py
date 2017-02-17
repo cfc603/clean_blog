@@ -18,7 +18,7 @@ class Blog(CreatedUpdated):
     category = models.ManyToManyField("main.Category")
 
     class Meta:
-        ordering = ['modified_date']
+        ordering = ['-modified_date']
 
     def __unicode__(self):
         return '%s' % self.title
