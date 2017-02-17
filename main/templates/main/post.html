@@ -1,4 +1,5 @@
 {% extends "main/_base.html" %}
+{% load staticfiles %}
 
 <!-- Head -->
 {% block title %}Clean Blog - {{ object.title }}{% endblock %}
@@ -26,7 +27,7 @@
 <article>
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <div class="col-md-10 col-md-offset-1">
             {% autoescape off %}
                 {{ object.body }}
             {% endautoescape %}
@@ -34,4 +35,25 @@
         </div>
     </div>
 </article>
+{% endblock %}
+
+{% block page_js %}
+<!-- SyntaxHighlighter -->
+
+<!-- Main JavaScript File -->
+<script type="text/javascript" src="{% static 'main/vendor/syntaxhighlighter/js/shCore.js' %}"></script>
+ 
+<!-- Brushes -->
+<script type="text/javascript" src="{% static 'main/vendor/syntaxhighlighter/js/shBrushPython.js' %}"></script>
+ 
+<!-- Styling -->
+<link href="{% static 'main/vendor/syntaxhighlighter/css/shCoreRDark.css' %}" rel="stylesheet" type="text/css" />
+<link href="{% static 'main/vendor/syntaxhighlighter/css/shThemeRDark.css' %}" rel="stylesheet" type="text/css" />
+ 
+<!-- Run the highlighter -->
+<script type="text/javascript">
+     SyntaxHighlighter.all()
+</script>
+
+<!-- End SyntaxHighlighter -->
 {% endblock %}
