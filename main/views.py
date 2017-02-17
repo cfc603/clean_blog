@@ -35,6 +35,7 @@ class ContactView(FormView):
 class HomeView(ListView):
     model = Blog
     template_name = "main/home.html"
+    paginate_by = 5
 
     def get_queryset(self):
         queryset = super(HomeView, self).get_queryset()

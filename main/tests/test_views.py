@@ -59,4 +59,6 @@ class HomeViewTest(TestCase):
         posts = mommy.make("main.Blog", _quantity=10)
         live_posts = mommy.make("main.Blog", live=True, _quantity=5)
         response = self.client.get(reverse("main:home"))
-        self.assertEqual(5, response.context['object_list'].count())
+        self.assertEqual(
+            5, response.context['paginator'].object_list.count()
+        )
