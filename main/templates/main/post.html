@@ -11,7 +11,11 @@
 {% block header %}
 <div class="post-heading">
     <h1>{{ object.title }}</h1>
-    <h2 class="subheading">{{ object.body|truncatewords:15 }}</h2>
+    <h2 class="subheading">
+        {% autoescape off %}
+            {{ object.body|truncatewords_html:15 }}
+        {% endautoescape %}
+    </h2>
     <span class="meta">Posted by <a href="{% url 'main:about' %}">Trevor Watson</a> on {{ object.modified_date|date:"N j, Y" }}</span>
 </div>
 {% endblock %}
@@ -23,7 +27,9 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            {% autoescape off %}
                 {{ object.body }}
+            {% endautoescape %}
             </div>
         </div>
     </div>

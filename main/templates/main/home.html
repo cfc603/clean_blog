@@ -30,7 +30,9 @@
                         {{ post.title }}
                     </h2>
                     <h3 class="post-subtitle">
-                        {{ post.body|truncatewords:15}}
+                        {% autoescape off %}
+                            {{ post.body|truncatewords_html:15}}
+                        {% endautoescape %}
                     </h3>
                 </a>
                 <p class="post-meta">Posted by <a href="{% url 'main:about' %}">Trevor Watson</a> on {{ post.modified_date|date:"N j, Y" }}</p>
