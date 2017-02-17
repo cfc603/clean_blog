@@ -24,12 +24,19 @@ def get_secrets(setting, secrets=secrets):
 # Application definition
 
 INSTALLED_APPS = (
+    # django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # local apps
+    'main',
+
+    # third-party apps
+    'django_forms_bootstrap',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -55,6 +62,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
+                'django.template.context_processors.media',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -88,3 +96,12 @@ MEDIA_ROOT = Path(BASE_DIR.parent + '/media')
 
 STAGING_URL = 'clean_blog-staging.trevorwatson.me'
 PRODUCTION_URL = ''
+
+
+# Email settings
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = get_secrets('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = get_secrets('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = '465'
+EMAIL_USE_SSL = True
+SERVER_EMAIL = get_secrets('SERVER_EMAIL')

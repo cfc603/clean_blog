@@ -1,0 +1,30 @@
+{% extends "main/_base.html" %}
+{% load staticfiles %}
+
+<!-- Head -->
+{% block title %}Clean Blog - Contact{% endblock %}
+
+<!-- body -->
+
+<!-- Header -->
+{% block header_image %}{% static 'main/img/contact-bg.jpg' %}{% endblock %}
+
+{% block header %}
+<div class="page-heading">
+    <h1>Contact Me</h1>
+    <hr class="small">
+    <span class="subheading">Have questions? I have answers (maybe).</span>
+</div>
+{% endblock %}
+
+
+<!-- Content -->
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <p>Your request has been submitted. We will be in contact soon.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "main/_base.html" %}
+{% load staticfiles %}
+
+<!-- Head -->
+{% block title %}Clean Blog{% endblock %}
+
+<!-- body -->
+
+<!-- Header -->
+{% block header_image %}{% static 'main/img/home-bg.jpg' %}{% endblock %}
+
+{% block header %}
+<div class="site-heading">
+    <h1>Clean Blog</h1>
+    <hr class="small">
+    <span class="subheading">A Clean Blog Theme by Start Bootstrap</span>
+</div>
+{% endblock %}
+
+
+<!-- Content -->
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            {% for post in object_list %}
+            <div class="post-preview">
+                <a href="{{ post.get_absolute_url }}">
+                    <h2 class="post-title">
+                        {{ post.title }}
+                    </h2>
+                    <h3 class="post-subtitle">
+                        {% autoescape off %}
+                            {{ post.body|truncatewords_html:15}}
+                        {% endautoescape %}
+                    </h3>
+                </a>
+                <p class="post-meta">Posted by <a href="{% url 'main:about' %}">Trevor Watson</a> on {{ post.modified_date|date:"N j, Y" }}</p>
+            </div>
+            <hr>
+            {% endfor %}
+            <!-- Pager -->
+            <ul class="pager">
+            {% if page_obj.has_previous %}
+                <li class="previous">
+                    <a href="?page={{ page_obj.previous_page_number }}">Newer Posts &larr;</a>
+                </li>
+            {% endif %}
+            {% if page_obj.paginator.num_pages > 1 %}
+                <li>
+                    <span>
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+            {% endif %}
+            {% if page_obj.has_next %}
+                <li class="next">
+                    <a href="?page={{ page_obj.next_page_number }}">Older Posts &rarr;</a>
+                </li>
+            {% endif %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
