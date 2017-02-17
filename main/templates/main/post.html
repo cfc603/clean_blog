@@ -1,5 +1,4 @@
 {% extends "main/_base.html" %}
-{% load staticfiles %}
 
 <!-- Head -->
 {% block title %}Clean Blog - {{ object.title }}{% endblock %}
@@ -7,7 +6,7 @@
 <!-- body -->
 
 <!-- Header -->
-{% block header_image %}{% static 'main/img/post-bg.jpg' %}{% endblock %}
+{% block header_image %}{{ MEDIA_URL }}{{ object.image }}{% endblock %}
 
 {% block header %}
 <div class="post-heading">

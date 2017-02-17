@@ -14,6 +14,7 @@ class CreatedUpdated(models.Model):
 class Blog(CreatedUpdated):
     title = models.CharField(max_length=100)
     body = models.TextField()
+    image = models.ImageField(upload_to="blog_images/%Y/%m/%d/")
     live = models.BooleanField(default=False)
     category = models.ManyToManyField("main.Category")
 
