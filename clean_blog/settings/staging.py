@@ -18,9 +18,9 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'cfc$clean_blog',
-            'USER': 'clean_blog',
+            'NAME': 'clean_blog',
+            'USER': 'admin',
             'PASSWORD': get_secrets('DATABASE_PASS_STAGING'),
-            'HOST': 'cfc.mysql.pythonanywhere-services.com',
+            'HOST': 'localhost',
         }
     }
