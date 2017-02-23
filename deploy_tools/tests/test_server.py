@@ -263,12 +263,12 @@ class ServerTest(TestCase):
 
 
     @patch("deploy_tools.server.run")
-    def test_restart_gunicorn(self, run):
+    def test_reload_gunicorn(self, run):
         server = self.server_for_tests()
-        server.restart_gunicorn()
+        server.reload_gunicorn()
 
         run.assert_called_once_with(
-            "sudo {}_gunicorn state=restarted".format(server.website)
+            "sudo reload gunicorn-{}".format(server.website)
         )
 
     @patch("deploy_tools.server.run")

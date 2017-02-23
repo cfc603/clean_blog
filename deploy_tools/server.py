@@ -105,8 +105,8 @@ class Server(object):
                 repo_url, self.source_directory
             ))
 
-    def restart_gunicorn(self):
-        run("sudo {}_gunicorn state=restarted".format(self.website))
+    def reload_gunicorn(self):
+        run("sudo reload gunicorn-{}".format(self.website))
 
     def set_env_variables(self):
         env.host_string = self.host

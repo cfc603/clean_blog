@@ -39,7 +39,9 @@ class Deployment(object):
             self.server.disable_nginx_config("default")
             self.server.enable_nginx_config()
 
-            self.set_gunicorn_config()
+            self.server.set_gunicorn_config()
+        else:
+            self.server.reload_gunicorn()
 
         if development:
             self.run_tests()
