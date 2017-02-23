@@ -33,6 +33,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     # local apps
+    'deploy_tools',
     'main',
 
     # third-party apps
@@ -105,3 +106,20 @@ EMAIL_HOST_PASSWORD = get_secrets('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = '465'
 EMAIL_USE_SSL = True
 SERVER_EMAIL = get_secrets('SERVER_EMAIL')
+
+
+# deploy_tools settings
+STAGING_HOST = 'wtrevor@174.138.76.178'
+STAGING_USER = 'wtrevor'
+STAGING_WEBSITE = 'unknown.com'
+
+PRODUCTION_HOST = ''
+PRODUCTION_USER = ''
+PRODUCTION_WEBSITE = ''
+
+APPS_TO_TEST = [
+    'deploy_tools',
+    'main',
+]
+PROJECT_NAME = 'clean_blog'
+REPO_URL = 'git@github.com:cfc603/clean_blog.git'
