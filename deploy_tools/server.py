@@ -119,9 +119,9 @@ class Server(object):
         ))
 
         replacements = {
-            "{{ site_name }}": self.website,
-            "{{ user }}": self.user,
-            "{{ project_name }}": self.project
+            "SITE_NAME": self.website,
+            "USER": self.user,
+            "PROJECT_NAME": self.project
         }
         for temp_var, value in replacements.iteritems():
             sed(self.gunicorn_config, temp_var, value, use_sudo=True)
@@ -135,11 +135,11 @@ class Server(object):
 
         sed(
             self.nginx_config,
-            "{{ site_name }}",
+            "SITE_NAME",
             self.website,
             use_sudo=True
         )
-        sed(self.nginx_config, "{{ user }}", self.user, use_sudo=True)
+        sed(self.nginx_config, "USER", self.user, use_sudo=True)
 
     def update_database(self):
         with cd(self.source_directory):

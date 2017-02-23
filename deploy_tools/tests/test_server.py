@@ -228,9 +228,9 @@ class ServerTest(TestCase):
             call("start {}".format(server.gunicorn_config))
         ])
         sed.assert_has_calls([
-            call(server.gunicorn_config, "{{ site_name }}", server.website, use_sudo=True),
-            call(server.gunicorn_config, "{{ user }}", server.user, use_sudo=True),
-            call(server.gunicorn_config, "{{ project_name }}", server.project, use_sudo=True),
+            call(server.gunicorn_config, "PROJECT_NAME", server.project, use_sudo=True),
+            call(server.gunicorn_config, "SITE_NAME", server.website, use_sudo=True),
+            call(server.gunicorn_config, "USER", server.user, use_sudo=True),
         ])
 
 
@@ -249,13 +249,13 @@ class ServerTest(TestCase):
         sed.assert_has_calls([
             call(
                 server.nginx_config,
-                "{{ site_name }}",
+                "SITE_NAME",
                 server.website,
                 use_sudo=True
             ),
             call(
                 server.nginx_config,
-                "{{ user }}",
+                "USER",
                 server.user,
                 use_sudo=True
             ),
