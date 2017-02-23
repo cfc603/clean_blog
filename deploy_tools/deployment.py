@@ -1,5 +1,3 @@
-import time
-
 from django.conf import settings as dj_settings
 
 from fabric.api import cd, env, prefix, put, run
@@ -47,7 +45,6 @@ class Deployment(object):
             self.run_tests()
 
     def run_tests(self):
-        time.sleep(120) # webapp reload can take up to two minutes
         with cd(self.server.source_directory):
             with prefix('workon {}'.format(self.server.website)):
                 for app in settings.APPS_TO_TEST:
