@@ -118,6 +118,7 @@ PRODUCTION_USER = ''
 PRODUCTION_WEBSITE = ''
 
 APPS_TO_TEST = [
+    'deploy_tools',
     'main',
 ]
 PROJECT_NAME = 'clean_blog'
