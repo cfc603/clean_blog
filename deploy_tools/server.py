@@ -114,7 +114,7 @@ class Server(object):
         return env
 
     def set_gunicorn_config(self):
-        sudo("cp {}/gunicorn-upstart-template.conf {}".format(
+        sudo("cp {}/gunicorn-upstart.template.conf {}".format(
             self.template_directory, self.gunicorn_config
         ))
 
@@ -126,7 +126,7 @@ class Server(object):
         for temp_var, value in replacements.iteritems():
             sed(self.gunicorn_config, temp_var, value, use_sudo=True)
 
-        sudo("start {}".format(self.gunicorn_config))
+        sudo("start gunicorn-{}".format(self.website))
 
     def set_nginx_config(self):
         sudo("cp {}/nginx.template.conf {}".format(

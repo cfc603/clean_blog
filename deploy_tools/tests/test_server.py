@@ -221,11 +221,11 @@ class ServerTest(TestCase):
 
         sudo.assert_has_calls([
             call(
-                "cp {}/gunicorn-upstart-template.conf {}".format(
+                "cp {}/gunicorn-upstart.template.conf {}".format(
                     server.template_directory, server.gunicorn_config
                 )
             ),
-            call("start {}".format(server.gunicorn_config))
+            call("start gunicorn-{}".format(server.website))
         ])
         sed.assert_has_calls([
             call(server.gunicorn_config, "PROJECT_NAME", server.project, use_sudo=True),
