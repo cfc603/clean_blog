@@ -221,11 +221,11 @@ class ServerTest(TestCase):
 
         sudo.assert_has_calls([
             call(
-                "cp {}/gunicorn-upstart-template.conf {}".format(
+                "cp {}/gunicorn-upstart.template.conf {}".format(
                     server.template_directory, server.gunicorn_config
                 )
             ),
-            call("start {}".format(server.gunicorn_config))
+            call("start gunicorn-{}".format(server.website))
         ])
         sed.assert_has_calls([
             call(server.gunicorn_config, "PROJECT_NAME", server.project, use_sudo=True),
@@ -263,12 +263,12 @@ class ServerTest(TestCase):
 
 
     @patch("deploy_tools.server.run")
-    def test_restart_gunicorn(self, run):
+    def test_reload_gunicorn(self, run):
         server = self.server_for_tests()
-        server.restart_gunicorn()
+        server.reload_gunicorn()
 
         run.assert_called_once_with(
-            "sudo {}_gunicorn state=restarted".format(server.website)
+            "sudo reload gunicorn-{}".format(server.website)
         )
 
     @patch("deploy_tools.server.run")

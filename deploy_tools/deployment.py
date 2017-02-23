@@ -39,7 +39,9 @@ class Deployment(object):
             self.server.disable_nginx_config("default")
             self.server.enable_nginx_config()
 
-            self.set_gunicorn_config()
+            self.server.set_gunicorn_config()
+        else:
+            self.server.reload_gunicorn()
 
         if development:
             self.run_tests()
@@ -47,7 +49,7 @@ class Deployment(object):
     def run_tests(self):
         with cd(self.server.source_directory):
             with prefix('workon {}'.format(self.server.website)):
-                for app in settings.APPS_TO_TEST:
+                for app in dj_settings.APPS_TO_TEST:
                     run('python manage.py test {}'.format(app))
 
     def update_secrets(self):
