@@ -109,7 +109,7 @@ SERVER_EMAIL = get_secrets('SERVER_EMAIL')
 
 
 # deploy_tools settings
-STAGING_HOST = 'wtrevor@174.138.76.178'
+STAGING_HOST = 'wtrevor@104.236.214.142'
 STAGING_USER = 'wtrevor'
 STAGING_WEBSITE = 'unknown.com'
 
