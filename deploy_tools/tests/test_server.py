@@ -11,7 +11,7 @@ class ServerTest(TestCase):
         data = {
             "host": "test_host",
             "user": "test_user",
-            "website": "test_site",
+            "url": "test_site",
             "project": "test_project",
         }
         for key, value in kwargs.iteritems():
@@ -23,7 +23,7 @@ class ServerTest(TestCase):
         server = self.server_for_tests()
         self.assertEqual(server.host, "test_host")
         self.assertEqual(server.user, "test_user")
-        self.assertEqual(server.website, "test_site")
+        self.assertEqual(server.url, "test_site")
         set_env_variables.assert_called_once()
 
     def test_gunicorn_config(self):
@@ -225,11 +225,11 @@ class ServerTest(TestCase):
                     server.template_directory, server.gunicorn_config
                 )
             ),
-            call("start gunicorn-{}".format(server.website))
+            call("start gunicorn-{}".format(server.url))
         ])
         sed.assert_has_calls([
             call(server.gunicorn_config, "PROJECT_NAME", server.project, use_sudo=True),
-            call(server.gunicorn_config, "SITE_NAME", server.website, use_sudo=True),
+            call(server.gunicorn_config, "SITE_NAME", server.url, use_sudo=True),
             call(server.gunicorn_config, "USER", server.user, use_sudo=True),
         ])
 
@@ -250,7 +250,7 @@ class ServerTest(TestCase):
             call(
                 server.nginx_config,
                 "SITE_NAME",
-                server.website,
+                server.url,
                 use_sudo=True
             ),
             call(
@@ -268,7 +268,7 @@ class ServerTest(TestCase):
         server.reload_gunicorn()
 
         run.assert_called_once_with(
-            "sudo reload gunicorn-{}".format(server.website)
+            "sudo reload gunicorn-{}".format(server.url)
         )
 
     @patch("deploy_tools.server.run")
@@ -280,7 +280,7 @@ class ServerTest(TestCase):
 
         cd.assert_called_once_with(server.source_directory)
         prefix.assert_called_once_with(
-            "workon {}".format(server.website)
+            "workon {}".format(server.url)
         )
         run.assert_called_once_with(
             "python manage.py migrate --noinput"
@@ -295,7 +295,7 @@ class ServerTest(TestCase):
 
         cd.assert_called_once_with(server.source_directory)
         prefix.assert_called_once_with(
-            "workon {}".format(server.website)
+            "workon {}".format(server.url)
         )
         run.assert_called_once_with(
             "python manage.py collectstatic --noinput"

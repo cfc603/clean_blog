@@ -16,11 +16,11 @@ class TestDeployment(TestCase):
 
             "STAGING_HOST": "staging_host",
             "STAGING_USER": "staging_user",
-            "STAGING_WEBSITE": "staging_website",
+            "STAGING_URL": "staging_url",
 
             "PRODUCTION_HOST": "production_host",
             "PRODUCTION_USER": "production_user",
-            "PRODUCTION_WEBSITE": "production_website",
+            "PRODUCTION_URL": "production_url",
         }
 
     @patch("deploy_tools.deployment.Server")
@@ -31,7 +31,7 @@ class TestDeployment(TestCase):
             server.assert_called_once_with(**{
                     "host": "staging_host",
                     "user": "staging_user",
-                    "website": "staging_website",
+                    "url": "staging_url",
                     "project": "project_test",
                     "development": True,
                 }
@@ -45,7 +45,7 @@ class TestDeployment(TestCase):
             server.assert_called_once_with(**{
                     "host": "production_host",
                     "user": "production_user",
-                    "website": "production_website",
+                    "url": "production_url",
                     "project": "project_test"
                 }
             )
