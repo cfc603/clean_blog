@@ -17,7 +17,7 @@ class Server(object):
     def __init__(self, **kwargs):
         self.host = kwargs.pop("host")
         self.user = kwargs.pop("user")
-        self.website = kwargs.pop("website")
+        self.url = kwargs.pop("url")
         self.project = kwargs.pop("project")
         self.development = kwargs.pop("development", False)
         self.set_env_variables()
@@ -25,13 +25,13 @@ class Server(object):
     @property
     def gunicorn_config(self):
         return "{}/gunicorn-{}.conf".format(
-            self.upstart_init_directory, self.website
+            self.upstart_init_directory, self.url
         )
 
     @property
     def nginx_config(self):
         return "{}/{}".format(
-            self.nginx_config_available, self.website
+            self.nginx_config_available, self.url
             )
 
     @property
@@ -55,7 +55,7 @@ class Server(object):
 
     @property
     def site_directory(self):
-        return "/home/{}/sites/{}".format(self.user, self.website)
+        return "/home/{}/sites/{}".format(self.user, self.url)
 
     @property
     def source_directory(self):
@@ -70,7 +70,7 @@ class Server(object):
     @property
     def virtualenv_directory(self):
         return "/home/{}/.virtualenvs/{}".format(
-            self.user, self.website
+            self.user, self.url
         )
 
     def create_directories(self):
@@ -86,7 +86,7 @@ class Server(object):
 
     def enable_nginx_config(self):
         config_link = "{}/{}".format(
-            self.nginx_config_enabled, self.website
+            self.nginx_config_enabled, self.url
         )
         if not exists(config_link):
             sudo(
@@ -106,7 +106,7 @@ class Server(object):
             ))
 
     def reload_gunicorn(self):
-        run("sudo reload gunicorn-{}".format(self.website))
+        run("sudo reload gunicorn-{}".format(self.url))
 
     def set_env_variables(self):
         env.host_string = self.host
@@ -119,14 +119,14 @@ class Server(object):
         ))
 
         replacements = {
-            "SITE_NAME": self.website,
+            "SITE_NAME": self.url,
             "USER": self.user,
             "PROJECT_NAME": self.project
         }
         for temp_var, value in replacements.iteritems():
             sed(self.gunicorn_config, temp_var, value, use_sudo=True)
 
-        sudo("start gunicorn-{}".format(self.website))
+        sudo("start gunicorn-{}".format(self.url))
 
     def set_nginx_config(self):
         sudo("cp {}/nginx.template.conf {}".format(
@@ -136,31 +136,31 @@ class Server(object):
         sed(
             self.nginx_config,
             "SITE_NAME",
-            self.website,
+            self.url,
             use_sudo=True
         )
         sed(self.nginx_config, "USER", self.user, use_sudo=True)
 
     def update_database(self):
         with cd(self.source_directory):
-            with prefix("workon {}".format(self.website)):
+            with prefix("workon {}".format(self.url)):
                 run("python manage.py migrate --noinput")
 
     def update_static_files(self):
         with cd(self.source_directory):
-            with prefix("workon {}".format(self.website)):
+            with prefix("workon {}".format(self.url)):
                 run("python manage.py collectstatic --noinput")
  
     def update_virtualenv(self):
         if not exists(self.virtualenv_directory):
-            run("mkvirtualenv {}".format(self.website))
+            run("mkvirtualenv {}".format(self.url))
             
             new_line = """echo 'export DJANGO_SETTINGS_MODULE="{}"' >> {}/bin/postactivate"""
             run(new_line.format(
                 self.settings_location, self.virtualenv_directory
             ))
 
-        with prefix("workon {}".format(self.website)):
+        with prefix("workon {}".format(self.url)):
             run("pip install -r {}/requirements.txt".format(
                 self.source_directory
             ))

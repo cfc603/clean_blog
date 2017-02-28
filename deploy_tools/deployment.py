@@ -12,7 +12,7 @@ class Deployment(object):
             self.server = Server(**{
                     "host": dj_settings.STAGING_HOST,
                     "user": dj_settings.STAGING_USER,
-                    "website": dj_settings.STAGING_WEBSITE,
+                    "url": dj_settings.STAGING_URL,
                     "project": dj_settings.PROJECT_NAME,
                     "development": development
                 }
@@ -21,7 +21,7 @@ class Deployment(object):
             self.server = Server(**{
                     "host": dj_settings.PRODUCTION_HOST,
                     "user": dj_settings.PRODUCTION_USER,
-                    "website": dj_settings.PRODUCTION_WEBSITE,
+                    "url": dj_settings.PRODUCTION_URL,
                     "project": dj_settings.PROJECT_NAME
                 }
             )
@@ -48,7 +48,7 @@ class Deployment(object):
 
     def run_tests(self):
         with cd(self.server.source_directory):
-            with prefix('workon {}'.format(self.server.website)):
+            with prefix('workon {}'.format(self.server.url)):
                 for app in dj_settings.APPS_TO_TEST:
                     run('python manage.py test {}'.format(app))
 
