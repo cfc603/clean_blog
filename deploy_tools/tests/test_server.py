@@ -242,12 +242,31 @@ class ServerTest(TestCase):
     @patch("deploy_tools.server.sed")
     @patch("deploy_tools.server.Certbot")
     @patch("deploy_tools.server.sudo")
-    def test_set_nginx_config(self, sudo, certbot, sed):
+    def test_set_nginx_config_if_not_secure(self, sudo, certbot, sed):
         server = self.server_for_tests()
         server.set_nginx_config()
 
         sudo.assert_called_once_with(
             "cp {}/deploy_tools/templates/nginx.template.conf {}".format(
+                server.source_directory,
+                server.nginx_config
+            )
+        )
+        sed.assert_has_calls([
+            call(server.nginx_config, "SITE_NAME", server.url, use_sudo=True),
+            call(server.nginx_config, "USER", server.user, use_sudo=True),
+            call(server.nginx_config, "ROOT_DIRECTORY", server.certbot.root_directory, use_sudo=True),
+        ])
+
+    @patch("deploy_tools.server.sed")
+    @patch("deploy_tools.server.Certbot")
+    @patch("deploy_tools.server.sudo")
+    def test_set_nginx_config_if_secure(self, sudo, certbot, sed):
+        server = self.server_for_tests()
+        server.set_nginx_config(True)
+
+        sudo.assert_called_once_with(
+            "cp {}/deploy_tools/templates/nginx-secure.template.conf {}".format(
                 server.source_directory,
                 server.nginx_config
             )
@@ -269,6 +288,13 @@ class ServerTest(TestCase):
         run.assert_called_once_with(
             "sudo reload gunicorn-{}".format(server.url)
         )
+
+    @patch("deploy_tools.server.sudo")
+    def test_reload_nginx(self, sudo):
+        server = self.server_for_tests()
+        server.reload_nginx()
+
+        sudo.assert_called_once_with("service nginx reload")
 
     @patch("deploy_tools.server.run")
     @patch("deploy_tools.server.prefix")

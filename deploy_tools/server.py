@@ -101,7 +101,7 @@ class Server(object):
                     config_link
                 )
             )
-            sudo("service nginx reload")
+            self.reload_nginx()
 
     def get_latest_source(self, repo_url):
         if exists("{}/.git".format(self.source_directory)):
@@ -114,9 +114,14 @@ class Server(object):
     def reload_gunicorn(self):
         run("sudo reload gunicorn-{}".format(self.url))
 
+    def reload_nginx(self):
+        sudo("service nginx reload")
+
     def secure_domain(self):
+        self.reload_nginx()
         self.certbot.get_certificate()
         self.certbot.generate_dhparam_file()
+        self.set_nginx_config(True)
 
     def set_env_variables(self):
         env.host_string = self.host
@@ -138,18 +143,26 @@ class Server(object):
 
         sudo("start gunicorn-{}".format(self.url))
 
-    def set_nginx_config(self):
-        sudo("cp {}/nginx.template.conf {}".format(
-            self.template_directory, self.nginx_config
+    def set_nginx_config(self, secure=False):
+        if not secure:
+            template = "{}/nginx.template.conf"
+        else:
+            template = "{}/nginx-secure.template.conf"
+        template = template.format(self.template_directory)
+
+        sudo("cp {} {}".format(
+            template, self.nginx_config
         ))
 
         replacements = {
             "SITE_NAME": self.url,
             "USER": self.user,
-            "SSL_DOMAIN_FILE": self.certbot.ssl_domain_file,
-            "SSL_PARAMS_FILE": self.certbot.ssl_params_file,
             "ROOT_DIRECTORY": self.certbot.root_directory,
         }
+        if secure:
+            replacements["SSL_DOMAIN_FILE"] = self.certbot.ssl_domain_file
+            replacements["SSL_PARAMS_FILE"] = self.certbot.ssl_params_file
+
         for temp_var, value in replacements.iteritems():
             sed(self.nginx_config, temp_var, value, use_sudo=True)
 

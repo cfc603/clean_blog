@@ -129,19 +129,19 @@ class CertbotTest(TestCase):
     def test_ssl_domain_file_if_not_exists(self, sed, snip_dir, sudo, exists):
         exists.return_value = False
         file = "ssl-test_url.com.conf"
+        file_path = "{}/{}".format(snip_dir, file)
 
         certbot = self.certbot_for_tests()
         ssl_domain_file = certbot.ssl_domain_file
 
         exists.assert_called_once_with(file)
         sudo.assert_called_once_with(
-            "cp test/template/dir/ssl-domain.template.conf {}/{}".format(
-                snip_dir,
-                file
+            "cp test/template/dir/ssl-domain.template.conf {}".format(
+                file_path
             )
         )
         sed.assert_called_once_with(
-            file, "DOMAIN", "test_url.com", use_sudo=True
+            file_path, "DOMAIN", "test_url.com", use_sudo=True
         )
         self.assertEqual(ssl_domain_file, file)
 
@@ -226,7 +226,7 @@ class CertbotTest(TestCase):
         certbot.get_certificate()
 
         sudo.assert_called_once_with(
-            "{} certonly -w {} -d test_url.com --agree-tos".format(
+            "{} certonly --webroot -w {} -d test_url.com --agree-tos".format(
                 certbot_program, root_dir
             )
         )
