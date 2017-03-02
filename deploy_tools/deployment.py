@@ -36,9 +36,9 @@ class Deployment(object):
 
         if initial:
             self.server.set_nginx_config()
-            self.server.secure_domain()
             self.server.disable_nginx_config("default")
             self.server.enable_nginx_config()
+            self.server.secure_domain()
 
             self.server.set_gunicorn_config()
         else:
