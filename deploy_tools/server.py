@@ -114,6 +114,9 @@ class Server(object):
     def reload_gunicorn(self):
         run("sudo reload gunicorn-{}".format(self.url))
 
+    def reload_nginx(self):
+        sudo("service nginx reload")
+
     def secure_domain(self):
         self.certbot.get_certificate()
         self.certbot.generate_dhparam_file()

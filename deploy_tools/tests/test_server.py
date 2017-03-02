@@ -270,6 +270,13 @@ class ServerTest(TestCase):
             "sudo reload gunicorn-{}".format(server.url)
         )
 
+    @patch("deploy_tools.server.sudo")
+    def test_reload_nginx(self, sudo):
+        server = self.server_for_tests()
+        server.reload_nginx()
+
+        sudo.assert_called_once_with("service nginx reload")
+
     @patch("deploy_tools.server.run")
     @patch("deploy_tools.server.prefix")
     @patch("deploy_tools.server.cd")
