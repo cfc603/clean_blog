@@ -109,11 +109,11 @@ SERVER_EMAIL = get_secrets('SERVER_EMAIL')
 
 
 # deploy_tools settings
-STAGING_HOST = '104.236.214.142'
+STAGING_HOST = '104.131.168.34'
 STAGING_USER = get_secrets('STAGING_USER')
 STAGING_URL = 'blog-staging.trevorwatson.info'
 
-PRODUCTION_HOST = '104.236.214.142'
+PRODUCTION_HOST = '104.131.168.34'
 PRODUCTION_USER = get_secrets('PRODUCTION_USER')
 PRODUCTION_URL = 'trevorwatson.info'
 
