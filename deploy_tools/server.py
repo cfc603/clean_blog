@@ -168,6 +168,13 @@ class Server(object):
         for temp_var, value in replacements.iteritems():
             sed(self.nginx_config, temp_var, value, use_sudo=True)
 
+    def set_template(self, template, location, replacements):
+        if not exists(location):
+            sudo("cp {} {}".format(template, location))
+
+        for temp_var, value in replacements.iteritems():
+            sed(location, temp_var, value, use_sudo=True)
+
     def update_database(self):
         with cd(self.source_directory):
             with prefix("workon {}".format(self.url)):
