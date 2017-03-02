@@ -27,15 +27,6 @@ class Certbot(object):
         return certbot
 
     @property
-    def dhparam_file(self):
-        file = "/etc/ssl/certs/dhparam.pem"
-
-        if not exists(file):
-            sudo("openssl dhparam -out {} 2048".format(file))
-
-        return file
-
-    @property
     def nginx_snippet_directory(self):
         directory = "/etc/nginx/snippets"
 
@@ -83,6 +74,12 @@ class Certbot(object):
             )
 
         return file
+
+    def generate_dhparam_file(self):
+        file = "/etc/ssl/certs/dhparam.pem"
+
+        if not exists(file):
+            sudo("openssl dhparam -out {} 2048".format(file))
 
     def get_certificate(self):
         sudo(

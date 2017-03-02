@@ -70,34 +70,6 @@ class CertbotTest(TestCase):
 
     @patch("deploy_tools.certbot.exists")
     @patch("deploy_tools.certbot.sudo")
-    def test_dhparam_file_if_not_exists(self, sudo, exists):
-        exists.return_value = False
-        file = "/etc/ssl/certs/dhparam.pem"
-
-        certbot = self.certbot_for_tests()
-        dhparam_file = certbot.dhparam_file
-
-        exists.assert_called_once_with(file)
-        sudo.assert_called_once_with(
-            "openssl dhparam -out {} 2048".format(file)
-        )
-        self.assertEqual(dhparam_file, file)
-
-    @patch("deploy_tools.certbot.exists")
-    @patch("deploy_tools.certbot.sudo")
-    def test_dhparam_file_if_exists(self, sudo, exists):
-        exists.return_value = True
-        file = "/etc/ssl/certs/dhparam.pem"
-
-        certbot = self.certbot_for_tests()
-        dhparam_file = certbot.dhparam_file
-
-        exists.assert_called_once_with(file)
-        sudo.assert_not_called()
-        self.assertEqual(dhparam_file, file)
-
-    @patch("deploy_tools.certbot.exists")
-    @patch("deploy_tools.certbot.sudo")
     def test_nginx_snippet_directory_if_not_exists(self, sudo, exists):
         exists.return_value = False
         directory = "/etc/nginx/snippets"
@@ -219,6 +191,32 @@ class CertbotTest(TestCase):
         exists.assert_called_once_with(file)
         sudo.assert_not_called()
         self.assertEqual(ssl_params_file, file)
+
+    @patch("deploy_tools.certbot.exists")
+    @patch("deploy_tools.certbot.sudo")
+    def test_generate_dhparam_file_if_not_exists(self, sudo, exists):
+        exists.return_value = False
+        file = "/etc/ssl/certs/dhparam.pem"
+
+        certbot = self.certbot_for_tests()
+        certbot.generate_dhparam_file()
+
+        exists.assert_called_once_with(file)
+        sudo.assert_called_once_with(
+            "openssl dhparam -out {} 2048".format(file)
+        )
+
+    @patch("deploy_tools.certbot.exists")
+    @patch("deploy_tools.certbot.sudo")
+    def test_generate_dhparam_file_if_exists(self, sudo, exists):
+        exists.return_value = True
+        file = "/etc/ssl/certs/dhparam.pem"
+
+        certbot = self.certbot_for_tests()
+        certbot.generate_dhparam_file()
+
+        exists.assert_called_once_with(file)
+        sudo.assert_not_called()
 
     @patch("deploy_tools.certbot.sudo")
     @patch("deploy_tools.certbot.Certbot.certbot_program")
