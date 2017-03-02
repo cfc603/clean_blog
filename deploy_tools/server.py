@@ -101,7 +101,7 @@ class Server(object):
                     config_link
                 )
             )
-            sudo("service nginx reload")
+            self.reload_nginx()
 
     def get_latest_source(self, repo_url):
         if exists("{}/.git".format(self.source_directory)):
@@ -118,6 +118,7 @@ class Server(object):
         sudo("service nginx reload")
 
     def secure_domain(self):
+        self.reload_nginx()
         self.certbot.get_certificate()
         self.certbot.generate_dhparam_file()
 
