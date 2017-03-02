@@ -19,12 +19,17 @@ class ServerTest(TestCase):
         return Server(**data)
 
     @patch("deploy_tools.server.Server.set_env_variables")
-    def test_init(self, set_env_variables):
+    @patch("deploy_tools.server.Certbot")
+    def test_init(self, certbot, set_env_variables):
         server = self.server_for_tests()
         self.assertEqual(server.host, "test_host")
         self.assertEqual(server.user, "test_user")
         self.assertEqual(server.url, "test_site")
         set_env_variables.assert_called_once()
+        certbot.assert_called_once_with(**{
+                "template_directory": server.template_directory,
+                "url": server.url
+            })
 
     def test_gunicorn_config(self):
         server = self.server_for_tests()
@@ -235,8 +240,9 @@ class ServerTest(TestCase):
 
 
     @patch("deploy_tools.server.sed")
+    @patch("deploy_tools.server.Certbot")
     @patch("deploy_tools.server.sudo")
-    def test_set_nginx_config(self, sudo, sed):
+    def test_set_nginx_config(self, sudo, certbot, sed):
         server = self.server_for_tests()
         server.set_nginx_config()
 
@@ -247,18 +253,11 @@ class ServerTest(TestCase):
             )
         )
         sed.assert_has_calls([
-            call(
-                server.nginx_config,
-                "SITE_NAME",
-                server.url,
-                use_sudo=True
-            ),
-            call(
-                server.nginx_config,
-                "USER",
-                server.user,
-                use_sudo=True
-            ),
+            call(server.nginx_config, "SSL_PARAMS_FILE", server.certbot.ssl_params_file, use_sudo=True),
+            call(server.nginx_config, "SITE_NAME", server.url, use_sudo=True),
+            call(server.nginx_config, "USER", server.user, use_sudo=True),
+            call(server.nginx_config, "ROOT_DIRECTORY", server.certbot.root_directory, use_sudo=True),
+            call(server.nginx_config, "SSL_DOMAIN_FILE", server.certbot.ssl_domain_file, use_sudo=True),
         ])
 
 

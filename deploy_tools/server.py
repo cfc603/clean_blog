@@ -1,6 +1,8 @@
 from fabric.contrib.files import exists, sed
 from fabric.api import cd, env, local, prefix, run, sudo
 
+from .certbot import Certbot
+
 
 class Server(object):
 
@@ -21,6 +23,10 @@ class Server(object):
         self.project = kwargs.pop("project")
         self.development = kwargs.pop("development", False)
         self.set_env_variables()
+        self.certbot = Certbot(**{
+                "template_directory": self.template_directory,
+                "url": self.url,
+            })
 
     @property
     def gunicorn_config(self):
@@ -108,6 +114,10 @@ class Server(object):
     def reload_gunicorn(self):
         run("sudo reload gunicorn-{}".format(self.url))
 
+    def secure_domain(self):
+        self.certbot.get_certificate()
+        self.certbot.generate_dhparam_file()
+
     def set_env_variables(self):
         env.host_string = self.host
         env.user = self.user
@@ -133,13 +143,15 @@ class Server(object):
             self.template_directory, self.nginx_config
         ))
 
-        sed(
-            self.nginx_config,
-            "SITE_NAME",
-            self.url,
-            use_sudo=True
-        )
-        sed(self.nginx_config, "USER", self.user, use_sudo=True)
+        replacements = {
+            "SITE_NAME": self.url,
+            "USER": self.user,
+            "SSL_DOMAIN_FILE": self.certbot.ssl_domain_file,
+            "SSL_PARAMS_FILE": self.certbot.ssl_params_file,
+            "ROOT_DIRECTORY": self.certbot.root_directory,
+        }
+        for temp_var, value in replacements.iteritems():
+            sed(self.nginx_config, temp_var, value, use_sudo=True)
 
     def update_database(self):
         with cd(self.source_directory):
