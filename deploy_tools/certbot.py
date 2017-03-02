@@ -49,14 +49,16 @@ class Certbot(object):
         file = "ssl-{}.conf".format(self.url)
 
         if not exists(file):
+            file_path = "{}/{}".format(
+                self.nginx_snippet_directory, file
+            )
             sudo(
-                "cp {}/ssl-domain.template.conf {}/{}".format(
+                "cp {}/ssl-domain.template.conf {}".format(
                     self.template_directory,
-                    self.nginx_snippet_directory,
-                    file
+                    file_path,
                 )
             )
-            sed(file, "DOMAIN", self.url, use_sudo=True)
+            sed(file_path, "DOMAIN", self.url, use_sudo=True)
 
         return file
 
