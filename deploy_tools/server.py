@@ -121,6 +121,7 @@ class Server(object):
         self.reload_nginx()
         self.certbot.get_certificate()
         self.certbot.generate_dhparam_file()
+        self.set_nginx_config(True)
 
     def set_env_variables(self):
         env.host_string = self.host
