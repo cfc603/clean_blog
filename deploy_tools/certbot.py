@@ -85,7 +85,7 @@ class Certbot(object):
 
     def get_certificate(self):
         sudo(
-            "{} certonly -w {} -d {} --agree-tos".format(
+            "{} certonly --webroot -w {} -d {} --agree-tos".format(
                 self.certbot_program, self.root_directory, self.url
             )
         )

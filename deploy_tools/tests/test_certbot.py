@@ -226,7 +226,7 @@ class CertbotTest(TestCase):
         certbot.get_certificate()
 
         sudo.assert_called_once_with(
-            "{} certonly -w {} -d test_url.com --agree-tos".format(
+            "{} certonly --webroot -w {} -d test_url.com --agree-tos".format(
                 certbot_program, root_dir
             )
         )
