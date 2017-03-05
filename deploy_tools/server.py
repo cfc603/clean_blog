@@ -182,6 +182,8 @@ class Server(object):
                 }
             )
 
+            self.reload_nginx()
+
     def set_template(self, template, location, replacements):
         if not exists(location):
             sudo("cp {} {}".format(template, location))

@@ -290,7 +290,8 @@ class ServerTest(TestCase):
         )
 
     @patch("deploy_tools.server.Server.set_template")
-    def test_set_nginx_redirect_config_if_www(self, set_template):
+    @patch("deploy_tools.server.Server.reload_nginx")
+    def test_set_nginx_redirect_config_if_www(self, reload_nginx, set_template):
         server = self.server_for_tests(**{"url": "www.test.com"})
         server.set_nginx_redirect_config()
 
@@ -306,13 +307,16 @@ class ServerTest(TestCase):
                 "SITE_NAME": "www.test.com"
             }
         )
+        reload_nginx.assert_called_once()
 
     @patch("deploy_tools.server.Server.set_template")
-    def test_set_nginx_redirect_config_if_not_www(self, set_template):
+    @patch("deploy_tools.server.Server.reload_nginx")
+    def test_set_nginx_redirect_config_if_not_www(self, reload_nginx, set_template):
         server = self.server_for_tests()
         server.set_nginx_redirect_config()
 
         set_template.assert_not_called()
+        reload_nginx.assert_not_called()
 
     @patch("deploy_tools.server.exists")
     @patch("deploy_tools.server.sudo")
