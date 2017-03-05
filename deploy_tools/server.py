@@ -167,6 +167,21 @@ class Server(object):
             template, self.nginx_config, replacements
         )
 
+    def set_nginx_redirect_config(self):
+        if "www." == self.url[:4]:
+            self.set_template(
+                "{}/nginx-redirect.template.conf".format(
+                    self.template_directory
+                ),
+                "{}/conf.d/redirect.conf".format(
+                    self.nginx_config_directory
+                ),
+                {
+                    "NON_WWW_SITE_NAME": self.url[4:],
+                    "SITE_NAME": self.url
+                }
+            )
+
     def set_template(self, template, location, replacements):
         if not exists(location):
             sudo("cp {} {}".format(template, location))
