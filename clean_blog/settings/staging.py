@@ -18,7 +18,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'clean_blog',
+            'NAME': 'staging_clean_blog',
             'USER': 'admin',
             'PASSWORD': get_secrets('DATABASE_PASS_STAGING'),
             'HOST': 'localhost',
