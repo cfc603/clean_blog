@@ -185,8 +185,7 @@ class Server(object):
             self.reload_nginx()
 
     def set_template(self, template, location, replacements):
-        if not exists(location):
-            sudo("cp {} {}".format(template, location))
+        sudo("cp {} {}".format(template, location))
 
         for temp_var, value in replacements.iteritems():
             sed(location, temp_var, value, use_sudo=True)

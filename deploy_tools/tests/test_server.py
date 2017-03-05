@@ -318,32 +318,13 @@ class ServerTest(TestCase):
         set_template.assert_not_called()
         reload_nginx.assert_not_called()
 
-    @patch("deploy_tools.server.exists")
     @patch("deploy_tools.server.sudo")
     @patch("deploy_tools.server.sed")
-    def test_set_template_if_not_exists(self, sed, sudo, exists):
-        exists.return_value = False
-
+    def test_set_template(self, sed, sudo):
         server = self.server_for_tests()
         server.set_template("template", "location", {"key": "value"})
 
-        exists.assert_called_once_with("location")
         sudo.assert_called_once_with("cp template location")
-        sed.assert_called_once_with(
-            "location", "key", "value", use_sudo=True
-        )
-
-    @patch("deploy_tools.server.exists")
-    @patch("deploy_tools.server.sudo")
-    @patch("deploy_tools.server.sed")
-    def test_set_template_if_exists(self, sed, sudo, exists):
-        exists.return_value = True
-
-        server = self.server_for_tests()
-        server.set_template("template", "location", {"key": "value"})
-
-        exists.assert_called_once_with("location")
-        sudo.assert_not_called()
         sed.assert_called_once_with(
             "location", "key", "value", use_sudo=True
         )
