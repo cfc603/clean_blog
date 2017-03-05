@@ -134,28 +134,29 @@ class CertbotTest(TestCase):
         certbot = self.certbot_for_tests()
         ssl_domain_file = certbot.ssl_domain_file
 
-        exists.assert_called_once_with(file)
+        exists.assert_called_once_with(file_path)
         sudo.assert_called_once_with(
             "cp test/template/dir/ssl-domain.template.conf {}".format(
                 file_path
             )
         )
         sed.assert_called_once_with(
-            file_path, "DOMAIN", "test_url.com", use_sudo=True
+            file_path, "URL", "test_url.com", use_sudo=True
         )
         self.assertEqual(ssl_domain_file, file)
 
     @patch("deploy_tools.certbot.exists")
     @patch("deploy_tools.certbot.sudo")
+    @patch("deploy_tools.certbot.Certbot.nginx_snippet_directory")
     @patch("deploy_tools.certbot.sed")
-    def test_ssl_domain_file_if_exists(self, sed, sudo, exists):
+    def test_ssl_domain_file_if_exists(self, sed, snip_dir, sudo, exists):
         exists.return_value = True
         file = "ssl-test_url.com.conf"
 
         certbot = self.certbot_for_tests()
         ssl_domain_file = certbot.ssl_domain_file
 
-        exists.assert_called_once_with(file)
+        exists.assert_called_once_with("{}/{}".format(snip_dir, file))
         sudo.assert_not_called()
         sed.assert_not_called()
         self.assertEqual(ssl_domain_file, file)
