@@ -115,7 +115,7 @@ STAGING_URL = 'blog-staging.trevorwatson.info'
 
 PRODUCTION_HOST = '104.131.168.34'
 PRODUCTION_USER = get_secrets('PRODUCTION_USER')
-PRODUCTION_URL = 'trevorwatson.info'
+PRODUCTION_URL = 'www.trevorwatson.info'
 
 APPS_TO_TEST = [
     'deploy_tools',
