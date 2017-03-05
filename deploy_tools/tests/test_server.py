@@ -211,75 +211,6 @@ class ServerTest(TestCase):
             )
         )
 
-    def test_set_env_variables(self):
-        server = self.server_for_tests()
-        env = server.set_env_variables()
-
-        self.assertEqual(env.host_string, "test_host")
-        self.assertEqual(env.user, "test_user")
-
-    @patch("deploy_tools.server.sed")
-    @patch("deploy_tools.server.sudo")
-    def test_set_gunicorn_config(self, sudo, sed):
-        server = self.server_for_tests()
-        server.set_gunicorn_config()
-
-        sudo.assert_has_calls([
-            call(
-                "cp {}/gunicorn-upstart.template.conf {}".format(
-                    server.template_directory, server.gunicorn_config
-                )
-            ),
-            call("start gunicorn-{}".format(server.url))
-        ])
-        sed.assert_has_calls([
-            call(server.gunicorn_config, "PROJECT_NAME", server.project, use_sudo=True),
-            call(server.gunicorn_config, "SITE_NAME", server.url, use_sudo=True),
-            call(server.gunicorn_config, "USER", server.user, use_sudo=True),
-        ])
-
-
-    @patch("deploy_tools.server.sed")
-    @patch("deploy_tools.server.Certbot")
-    @patch("deploy_tools.server.sudo")
-    def test_set_nginx_config_if_not_secure(self, sudo, certbot, sed):
-        server = self.server_for_tests()
-        server.set_nginx_config()
-
-        sudo.assert_called_once_with(
-            "cp {}/deploy_tools/templates/nginx.template.conf {}".format(
-                server.source_directory,
-                server.nginx_config
-            )
-        )
-        sed.assert_has_calls([
-            call(server.nginx_config, "SITE_NAME", server.url, use_sudo=True),
-            call(server.nginx_config, "USER", server.user, use_sudo=True),
-            call(server.nginx_config, "ROOT_DIRECTORY", server.certbot.root_directory, use_sudo=True),
-        ])
-
-    @patch("deploy_tools.server.sed")
-    @patch("deploy_tools.server.Certbot")
-    @patch("deploy_tools.server.sudo")
-    def test_set_nginx_config_if_secure(self, sudo, certbot, sed):
-        server = self.server_for_tests()
-        server.set_nginx_config(True)
-
-        sudo.assert_called_once_with(
-            "cp {}/deploy_tools/templates/nginx-secure.template.conf {}".format(
-                server.source_directory,
-                server.nginx_config
-            )
-        )
-        sed.assert_has_calls([
-            call(server.nginx_config, "SSL_PARAMS_FILE", server.certbot.ssl_params_file, use_sudo=True),
-            call(server.nginx_config, "SITE_NAME", server.url, use_sudo=True),
-            call(server.nginx_config, "USER", server.user, use_sudo=True),
-            call(server.nginx_config, "ROOT_DIRECTORY", server.certbot.root_directory, use_sudo=True),
-            call(server.nginx_config, "SSL_DOMAIN_FILE", server.certbot.ssl_domain_file, use_sudo=True),
-        ])
-
-
     @patch("deploy_tools.server.run")
     def test_reload_gunicorn(self, run):
         server = self.server_for_tests()
@@ -295,6 +226,127 @@ class ServerTest(TestCase):
         server.reload_nginx()
 
         sudo.assert_called_once_with("service nginx reload")
+
+    def test_set_env_variables(self):
+        server = self.server_for_tests()
+        env = server.set_env_variables()
+
+        self.assertEqual(env.host_string, "test_host")
+        self.assertEqual(env.user, "test_user")
+
+    @patch("deploy_tools.server.Server.set_template")
+    @patch("deploy_tools.server.sudo")
+    def test_set_gunicorn_config(self, sudo, set_template):
+        server = self.server_for_tests()
+        server.set_gunicorn_config()
+
+        set_template.assert_called_once_with(
+            "{}/gunicorn-upstart.template.conf".format(
+                server.template_directory
+            ),
+            server.gunicorn_config,
+            {
+                "SITE_NAME": server.url,
+                "USER": server.user,
+                "PROJECT_NAME": server.project,
+            }
+        )
+        sudo.assert_called_once_with("start gunicorn-test_site")
+
+    @patch("deploy_tools.server.Certbot")
+    @patch("deploy_tools.server.Server.set_template")
+    def test_set_nginx_config_if_not_secure(self, set_template, certbot):
+        server = self.server_for_tests()
+        server.set_nginx_config()
+
+        set_template.assert_called_once_with(
+            "{}/nginx.template.conf".format(server.template_directory),
+            server.nginx_config,
+            {
+                "SITE_NAME": server.url,
+                "USER": server.user,
+                "ROOT_DIRECTORY": server.certbot.root_directory,
+            }
+        )
+
+    @patch("deploy_tools.server.Certbot")
+    @patch("deploy_tools.server.Server.set_template")
+    def test_set_nginx_config_if_secure(self, set_template, certbot):
+        server = self.server_for_tests()
+        server.set_nginx_config(True)
+
+        set_template.assert_called_once_with(
+            "{}/nginx-secure.template.conf".format(
+                server.template_directory
+            ),
+            server.nginx_config,
+            {
+                "SITE_NAME": server.url,
+                "USER": server.user,
+                "ROOT_DIRECTORY": server.certbot.root_directory,
+                "SSL_DOMAIN_FILE": server.certbot.ssl_domain_file,
+                "SSL_PARAMS_FILE": server.certbot.ssl_params_file,
+            }
+        )
+
+    @patch("deploy_tools.server.Server.set_template")
+    @patch("deploy_tools.server.Server.reload_nginx")
+    def test_set_nginx_redirect_config_if_www(self, reload_nginx, set_template):
+        server = self.server_for_tests(**{"url": "www.test.com"})
+        server.set_nginx_redirect_config()
+
+        set_template.assert_called_once_with(
+            "{}/nginx-redirect.template.conf".format(
+                server.template_directory
+            ),
+            "{}/conf.d/redirect.conf".format(
+                server.nginx_config_directory
+            ),
+            {
+                "NON_WWW_SITE_NAME": "test.com",
+                "SITE_NAME": "www.test.com"
+            }
+        )
+        reload_nginx.assert_called_once()
+
+    @patch("deploy_tools.server.Server.set_template")
+    @patch("deploy_tools.server.Server.reload_nginx")
+    def test_set_nginx_redirect_config_if_not_www(self, reload_nginx, set_template):
+        server = self.server_for_tests()
+        server.set_nginx_redirect_config()
+
+        set_template.assert_not_called()
+        reload_nginx.assert_not_called()
+
+    @patch("deploy_tools.server.exists")
+    @patch("deploy_tools.server.sudo")
+    @patch("deploy_tools.server.sed")
+    def test_set_template_if_not_exists(self, sed, sudo, exists):
+        exists.return_value = False
+
+        server = self.server_for_tests()
+        server.set_template("template", "location", {"key": "value"})
+
+        exists.assert_called_once_with("location")
+        sudo.assert_called_once_with("cp template location")
+        sed.assert_called_once_with(
+            "location", "key", "value", use_sudo=True
+        )
+
+    @patch("deploy_tools.server.exists")
+    @patch("deploy_tools.server.sudo")
+    @patch("deploy_tools.server.sed")
+    def test_set_template_if_exists(self, sed, sudo, exists):
+        exists.return_value = True
+
+        server = self.server_for_tests()
+        server.set_template("template", "location", {"key": "value"})
+
+        exists.assert_called_once_with("location")
+        sudo.assert_not_called()
+        sed.assert_called_once_with(
+            "location", "key", "value", use_sudo=True
+        )
 
     @patch("deploy_tools.server.run")
     @patch("deploy_tools.server.prefix")

@@ -131,17 +131,19 @@ class Server(object):
         return env
 
     def set_gunicorn_config(self):
-        sudo("cp {}/gunicorn-upstart.template.conf {}".format(
-            self.template_directory, self.gunicorn_config
-        ))
-
         replacements = {
             "SITE_NAME": self.url,
             "USER": self.user,
             "PROJECT_NAME": self.project
         }
-        for temp_var, value in replacements.iteritems():
-            sed(self.gunicorn_config, temp_var, value, use_sudo=True)
+
+        self.set_template(
+            "{}/gunicorn-upstart.template.conf".format(
+                self.template_directory
+            ),
+            self.gunicorn_config,
+            replacements
+        )
 
         sudo("start gunicorn-{}".format(self.url))
 
@@ -152,10 +154,6 @@ class Server(object):
             template = "{}/nginx-secure.template.conf"
         template = template.format(self.template_directory)
 
-        sudo("cp {} {}".format(
-            template, self.nginx_config
-        ))
-
         replacements = {
             "SITE_NAME": self.url,
             "USER": self.user,
@@ -165,8 +163,33 @@ class Server(object):
             replacements["SSL_DOMAIN_FILE"] = self.certbot.ssl_domain_file
             replacements["SSL_PARAMS_FILE"] = self.certbot.ssl_params_file
 
+        self.set_template(
+            template, self.nginx_config, replacements
+        )
+
+    def set_nginx_redirect_config(self):
+        if "www." == self.url[:4]:
+            self.set_template(
+                "{}/nginx-redirect.template.conf".format(
+                    self.template_directory
+                ),
+                "{}/conf.d/redirect.conf".format(
+                    self.nginx_config_directory
+                ),
+                {
+                    "NON_WWW_SITE_NAME": self.url[4:],
+                    "SITE_NAME": self.url
+                }
+            )
+
+            self.reload_nginx()
+
+    def set_template(self, template, location, replacements):
+        if not exists(location):
+            sudo("cp {} {}".format(template, location))
+
         for temp_var, value in replacements.iteritems():
-            sed(self.nginx_config, temp_var, value, use_sudo=True)
+            sed(location, temp_var, value, use_sudo=True)
 
     def update_database(self):
         with cd(self.source_directory):
