@@ -234,66 +234,60 @@ class ServerTest(TestCase):
         self.assertEqual(env.host_string, "test_host")
         self.assertEqual(env.user, "test_user")
 
-    @patch("deploy_tools.server.sed")
+    @patch("deploy_tools.server.Server.set_template")
     @patch("deploy_tools.server.sudo")
-    def test_set_gunicorn_config(self, sudo, sed):
+    def test_set_gunicorn_config(self, sudo, set_template):
         server = self.server_for_tests()
         server.set_gunicorn_config()
 
-        sudo.assert_has_calls([
-            call(
-                "cp {}/gunicorn-upstart.template.conf {}".format(
-                    server.template_directory, server.gunicorn_config
-                )
+        set_template.assert_called_once_with(
+            "{}/gunicorn-upstart.template.conf".format(
+                server.template_directory
             ),
-            call("start gunicorn-{}".format(server.url))
-        ])
-        sed.assert_has_calls([
-            call(server.gunicorn_config, "PROJECT_NAME", server.project, use_sudo=True),
-            call(server.gunicorn_config, "SITE_NAME", server.url, use_sudo=True),
-            call(server.gunicorn_config, "USER", server.user, use_sudo=True),
-        ])
+            server.gunicorn_config,
+            {
+                "SITE_NAME": server.url,
+                "USER": server.user,
+                "PROJECT_NAME": server.project,
+            }
+        )
+        sudo.assert_called_once_with("start gunicorn-test_site")
 
-
-    @patch("deploy_tools.server.sed")
     @patch("deploy_tools.server.Certbot")
-    @patch("deploy_tools.server.sudo")
-    def test_set_nginx_config_if_not_secure(self, sudo, certbot, sed):
+    @patch("deploy_tools.server.Server.set_template")
+    def test_set_nginx_config_if_not_secure(self, set_template, certbot):
         server = self.server_for_tests()
         server.set_nginx_config()
 
-        sudo.assert_called_once_with(
-            "cp {}/deploy_tools/templates/nginx.template.conf {}".format(
-                server.source_directory,
-                server.nginx_config
-            )
+        set_template.assert_called_once_with(
+            "{}/nginx.template.conf".format(server.template_directory),
+            server.nginx_config,
+            {
+                "SITE_NAME": server.url,
+                "USER": server.user,
+                "ROOT_DIRECTORY": server.certbot.root_directory,
+            }
         )
-        sed.assert_has_calls([
-            call(server.nginx_config, "SITE_NAME", server.url, use_sudo=True),
-            call(server.nginx_config, "USER", server.user, use_sudo=True),
-            call(server.nginx_config, "ROOT_DIRECTORY", server.certbot.root_directory, use_sudo=True),
-        ])
 
-    @patch("deploy_tools.server.sed")
     @patch("deploy_tools.server.Certbot")
-    @patch("deploy_tools.server.sudo")
-    def test_set_nginx_config_if_secure(self, sudo, certbot, sed):
+    @patch("deploy_tools.server.Server.set_template")
+    def test_set_nginx_config_if_secure(self, set_template, certbot):
         server = self.server_for_tests()
         server.set_nginx_config(True)
 
-        sudo.assert_called_once_with(
-            "cp {}/deploy_tools/templates/nginx-secure.template.conf {}".format(
-                server.source_directory,
-                server.nginx_config
-            )
+        set_template.assert_called_once_with(
+            "{}/nginx-secure.template.conf".format(
+                server.template_directory
+            ),
+            server.nginx_config,
+            {
+                "SITE_NAME": server.url,
+                "USER": server.user,
+                "ROOT_DIRECTORY": server.certbot.root_directory,
+                "SSL_DOMAIN_FILE": server.certbot.ssl_domain_file,
+                "SSL_PARAMS_FILE": server.certbot.ssl_params_file,
+            }
         )
-        sed.assert_has_calls([
-            call(server.nginx_config, "SSL_PARAMS_FILE", server.certbot.ssl_params_file, use_sudo=True),
-            call(server.nginx_config, "SITE_NAME", server.url, use_sudo=True),
-            call(server.nginx_config, "USER", server.user, use_sudo=True),
-            call(server.nginx_config, "ROOT_DIRECTORY", server.certbot.root_directory, use_sudo=True),
-            call(server.nginx_config, "SSL_DOMAIN_FILE", server.certbot.ssl_domain_file, use_sudo=True),
-        ])
 
     @patch("deploy_tools.server.exists")
     @patch("deploy_tools.server.sudo")
