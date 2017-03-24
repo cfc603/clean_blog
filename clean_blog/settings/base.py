@@ -101,3 +101,42 @@ EMAIL_HOST_PASSWORD = get_secrets('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = '465'
 EMAIL_USE_SSL = True
 SERVER_EMAIL = get_secrets('SERVER_EMAIL')
+
+
+# Logging settings.
+
+ADMIN = [("Trevor", get_secrets('SERVER_EMAIL')),]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s  [%(name)s:%(lineno)s]  %(levelname)s - %(message)s',
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s',
+        },
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        }
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
+        }
+    },
+}
