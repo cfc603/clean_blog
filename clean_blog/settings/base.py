@@ -33,7 +33,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     # local apps
-    'deploy_tools',
     'main',
 
     # third-party apps

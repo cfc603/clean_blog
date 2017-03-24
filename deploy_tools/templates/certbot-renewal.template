@@ -1,3 +1,0 @@
-#!/bin/sh
-
-47 4,16 * * * root /usr/local/certbot/certbot-auto renew > /usr/local/certbot/cerbot-cron.log
