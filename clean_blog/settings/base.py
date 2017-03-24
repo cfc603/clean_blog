@@ -95,10 +95,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(BASE_DIR.parent + '/media')
 
 
-STAGING_URL = 'clean_blog-staging.trevorwatson.me'
-PRODUCTION_URL = ''
-
-
 # Email settings
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = get_secrets('EMAIL_HOST_USER')
@@ -106,20 +102,3 @@ EMAIL_HOST_PASSWORD = get_secrets('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = '465'
 EMAIL_USE_SSL = True
 SERVER_EMAIL = get_secrets('SERVER_EMAIL')
-
-
-# deploy_tools settings
-STAGING_HOST = '104.131.168.34'
-STAGING_USER = get_secrets('STAGING_USER')
-STAGING_URL = 'blog-staging.trevorwatson.info'
-
-PRODUCTION_HOST = '104.131.168.34'
-PRODUCTION_USER = get_secrets('PRODUCTION_USER')
-PRODUCTION_URL = 'www.trevorwatson.info'
-
-APPS_TO_TEST = [
-    'deploy_tools',
-    'main',
-]
-PROJECT_NAME = 'clean_blog'
-REPO_URL = 'git@github.com:cfc603/clean_blog.git'
