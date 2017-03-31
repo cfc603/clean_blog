@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'main',
 
     # third-party apps
+    'analytical',
     'django_forms_bootstrap',
 )
 
@@ -92,6 +93,11 @@ STATIC_ROOT = Path(BASE_DIR.parent + '/static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = Path(BASE_DIR.parent + '/media')
+
+# Django Analytics
+GOOGLE_ANALYTICS_PROPERTY_ID = 'UA-96559286-3'
+GOOGLE_ANALYTICS_SITE_SPEED = True
+INTERNAL_IPS = ['127.0.0.1',]
 
 
 # Email settings
