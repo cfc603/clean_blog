@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'main',
 
     # third-party apps
+    'analytical',
     'django_forms_bootstrap',
 )
 
